@@ -168,6 +168,16 @@ class BaseThumbnailField(ImageField):
                 name = "%r of 'extra_thumbnails'"
                 _verify_thumbnail_attrs(attrs, name)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(BaseThumbnailField, self).deconstruct()
+        if self.extra_thumbnails is not None:
+            kwargs['extra_thumbnails'] = self.extra_thumbnails
+        if self.thumbnail_tag != TAG_HTML:
+            kwargs['thumbnail_tag'] = self.thumbnail_tag
+        if self.generate_on_save != False:
+            kwargs['generate_on_save'] = self.generate_on_save
+        return name, path, args, kwargs
+
     def south_field_triple(self):
         """
         Return a suitable description of this field for South.
@@ -196,6 +206,12 @@ class ImageWithThumbnailsField(BaseThumbnailField):
     def __init__(self, *args, **kwargs):
         self.thumbnail = kwargs.pop('thumbnail', None)
         super(ImageWithThumbnailsField, self).__init__(*args, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(ImageWithThumbnailsField, self).deconstruct()
+        if self.thumbnail is not None:
+            kwargs['thumbnail'] = self.thumbnail
+        return name, path, args, kwargs
 
 
 class ThumbnailField(BaseThumbnailField):
